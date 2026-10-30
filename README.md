@@ -26,7 +26,11 @@ Verified in this repo's CI / local checks:
 - `cargo check -p obsidian-rust-app` on Linux (host)
 - `cargo check -p obsidian-rust-app --target x86_64-pc-windows-gnu`
 - `cargo check -p obsidian-rust-app --target aarch64-linux-android`
-  (check only; the APK build itself needs the Android NDK, see below)
+- Android APK actually built (2026-10-30): debug 85 MB and
+  release-optimized 2.4 MB, both `apksigner verify` v2/v3,
+  package `tech.kuboes.obsidianrust`, arm64-v8a, min SDK 26 /
+  target SDK 34. See `docs/ANDROID.md`. Not run on a device
+  here (no device attached, no KVM emulator).
 
 ## Layout
 

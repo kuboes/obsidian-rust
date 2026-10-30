@@ -6,12 +6,34 @@ The app crate already has the Android entry point:
   `#[cfg(target_os = "android")]`
 - `crates/app/Cargo.toml`: `[package.metadata.android]` with
   package `tech.kuboes.obsidianrust`, target `aarch64-linux-android`,
-  and storage permissions. Note: on modern Android, a vault folder
-  should come from the Storage Access Framework picker; the typed
-  path in v0.1 is a desktop-first placeholder (see roadmap).
+  min SDK 26, target SDK 34, and storage permissions.
+  Note: on modern Android, a vault folder should come from the
+  Storage Access Framework picker; the typed path in v0.1 is a
+  desktop-first placeholder (see roadmap).
 
-`cargo check --target aarch64-linux-android` passes for the app
-crate (verified locally). That is a compile check, not an APK.
+## Built APK (2026-10-30, verified locally)
+
+- Debug APK via `cargo apk build --lib`: 85 MB, signed with the
+  Android debug key, `apksigner verify` passes (v2/v3).
+  SHA-256 (debug): `2d3ead9ae5e49ee9d979b960aeb2da36d3774a8fc52278d7b1a1a25169f6335b`
+- Release-optimized APK, assembled from the release `.so`
+  (cargo-apk's release flow needs a configured release keystore,
+  so the release `.so` was zipaligned + signed with the debug
+  key instead — installable, but **debug-signed, not a
+  production key**; a future production-signed build will
+  require uninstalling this one first): **2.4 MB**,
+  SHA-256: `f4620c19b8f83cf1a918e90667a1cc20824d680c2595bdf963e10f9fb7ea1a07`,
+  `apksigner verify` passes (v2/v3), not debuggable,
+  `arm64-v8a` only.
+- Toolchain used: cargo-apk 0.10.0, Temurin JDK 17,
+  build-tools 34.0.0, platform android-34, NDK r27c
+  (27.2.12479018). Note: `sdkmanager` failed behind this VM's
+  proxy, so the SDK packages were downloaded directly from
+  `dl.google.com` instead.
+- Not tested on a device or emulator here: no device was
+  attached (`adb devices` empty) and this VM has no KVM for
+  an emulator. On-device behaviour (keyboard, vault path)
+  is unverified — please report what happens on your phone.
 
 ## To produce an APK (needs Android SDK + NDK)
 
@@ -21,11 +43,12 @@ cargo install cargo-apk
 
 # Point cargo-apk at your SDK/NDK, e.g.:
 export ANDROID_HOME="$HOME/Android/Sdk"
-export ANDROID_NDK_HOME="$ANDROID_HOME/ndk/<version>"
+export ANDROID_NDK_HOME="$ANDROID_HOME/ndk/27.2.12479018"
 
 cd crates/app
-cargo apk run --lib   # builds + installs to a connected device/emulator
-# or: cargo apk build --lib --release
+cargo apk build --lib   # debug APK, signed with the debug key
+# release: build the release .so, then zipalign + apksigner
+# (see above — cargo-apk release needs a release keystore config)
 ```
 
 ## Known Android gaps in v0.1 (honest list)
