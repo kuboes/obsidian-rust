@@ -43,3 +43,9 @@ name = "android.permission.READ_EXTERNAL_STORAGE"
 
 [[package.metadata.android.uses_permission]]
 name = "android.permission.WRITE_EXTERNAL_STORAGE"
+
+# Modern Android ignores READ/WRITE_EXTERNAL_STORAGE for other apps'
+# folders. This declares the all-files-access permission so the
+# user can grant it in Settings; it is NOT granted automatically.
+[[package.metadata.android.uses_permission]]
+name = "android.permission.MANAGE_EXTERNAL_STORAGE"

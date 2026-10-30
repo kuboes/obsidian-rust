@@ -11,6 +11,33 @@ The app crate already has the Android entry point:
   Storage Access Framework picker; the typed path in v0.1 is a
   desktop-first placeholder (see roadmap).
 
+## v0.2 (2026-10-30, after "UIが操作できない / 互換性0" feedback)
+
+Root causes found:
+
+- v0.1 used the desktop 3-panel layout on a phone screen:
+  panels crowded each other out and buttons were tiny.
+- On modern Android, READ_EXTERNAL_STORAGE does not let an
+  app open another app's folder, so opening a real vault
+  failed and the note list stayed empty — which looks like
+  "compatibility 0" even though the vault parser itself works.
+
+Fixes in v0.2:
+
+- Narrow windows (< 900 pt) now use one view at a time with
+  large tab buttons: ノート一覧 / 編集 / リンク, larger text
+  and 48–56 pt buttons. Desktop keeps the 3-panel layout.
+- Android now auto-opens a sample vault inside the app's own
+  files directory (`/data/data/tech.kuboes.obsidianrust/files/vault-sample`,
+  no permission needed), so notes/links/backlinks work
+  immediately, with no path typing.
+- Manifest now also declares MANAGE_EXTERNAL_STORAGE, so a
+  user who wants their own vault folder can grant all-files
+  access in Settings > Apps > obsidian_rust > Permissions.
+  The app cannot grant this itself; the error message in
+  the app now says so.
+- "サンプルvaultで試す" and "新規ノート" buttons added.
+
 ## Built APK (2026-10-30, verified locally)
 
 - Debug APK via `cargo apk build --lib`: 85 MB, signed with the
@@ -22,9 +49,9 @@ The app crate already has the Android entry point:
   key instead — installable, but **debug-signed, not a
   production key**; a future production-signed build will
   require uninstalling this one first): **2.4 MB**,
-  SHA-256: `f4620c19b8f83cf1a918e90667a1cc20824d680c2595bdf963e10f9fb7ea1a07`,
+  v0.2 SHA-256: `dc4c799266bfd4fd75670374dd843a8e4be758e8548e3439f92eecc95c09b7d9`,
   `apksigner verify` passes (v2/v3), not debuggable,
-  `arm64-v8a` only.
+  `arm64-v8a` only. (v0.1 release was `f4620c19…7ea1a07`.)
 - Toolchain used: cargo-apk 0.10.0, Temurin JDK 17,
   build-tools 34.0.0, platform android-34, NDK r27c
   (27.2.12479018). Note: `sdkmanager` failed behind this VM's
