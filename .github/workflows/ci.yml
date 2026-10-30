@@ -1,0 +1,23 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android, x86_64-pc-windows-gnu
+      - run: cargo test -p vault-core -p kubo-notes
+      - run: cargo check -p obsidian-rust-app
+      - run: cargo check -p obsidian-rust-app --target aarch64-linux-android
+      - run: cargo check -p obsidian-rust-app --target x86_64-pc-windows-gnu
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo check -p obsidian-rust-app

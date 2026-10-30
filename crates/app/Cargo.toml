@@ -1,0 +1,41 @@
+[package]
+name = "obsidian-rust-app"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Desktop/mobile UI for kuboes/obsidian-rust (egui/eframe: Linux, Windows, Android via the same crate)."
+
+[lib]
+name = "obsidian_rust_app"
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "obsidian-rust"
+path = "src/main.rs"
+
+[dependencies]
+vault-core = { path = "../vault-core" }
+
+# Desktop: full eframe defaults (incl. accesskit).
+[target.'cfg(not(target_os = "android"))'.dependencies]
+eframe = "0.32"
+egui = "0.32"
+
+# Android: eframe's `accesskit` is incompatible with
+# `android-native-activity`, so use no-default-features here.
+# Plain `cargo check --target aarch64-linux-android` is not the
+# APK path; the APK path is `cargo apk` (see docs/ANDROID.md).
+[target.'cfg(target_os = "android")'.dependencies]
+eframe = { version = "0.32", default-features = false, features = ["android-native-activity", "default_fonts", "glow"] }
+egui = "0.32"
+winit = "0.30"
+
+[package.metadata.android]
+package = "tech.kuboes.obsidianrust"
+build_targets = ["aarch64-linux-android"]
+
+[[package.metadata.android.uses_permission]]
+name = "android.permission.READ_EXTERNAL_STORAGE"
+
+[[package.metadata.android.uses_permission]]
+name = "android.permission.WRITE_EXTERNAL_STORAGE"

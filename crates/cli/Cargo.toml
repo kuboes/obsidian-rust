@@ -1,0 +1,13 @@
+[package]
+name = "kubo-notes"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "CLI for kuboes/obsidian-rust vaults: list, graph, backlinks, search, check."
+
+[[bin]]
+name = "kubo-notes"
+path = "src/main.rs"
+
+[dependencies]
+vault-core = { path = "../vault-core" }
